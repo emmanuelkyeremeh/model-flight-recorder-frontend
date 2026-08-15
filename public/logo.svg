@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Model Flight Recorder">
+  <title>Model Flight Recorder</title>
+
+  <rect width="128" height="128" rx="28" fill="#0A0A0A"/>
+  <rect x="1.5" y="1.5" width="125" height="125" rx="26.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1.5"/>
+
+  <!-- Instrument bezel -->
+  <circle cx="64" cy="64" r="45" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="1.5"/>
+
+  <!-- Bezel ticks at the cardinal headings -->
+  <g stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round">
+    <path d="M64 19 V27"/>
+    <path d="M64 101 V109"/>
+    <path d="M19 64 H27"/>
+    <path d="M101 64 H109"/>
+  </g>
+
+  <!-- Horizon reference -->
+  <path d="M22 82 H106" stroke="#FFFFFF" stroke-opacity="0.24" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Recorded route: each node a sampled token, rising through the horizon -->
+  <path d="M26 92 L42 84 L58 70 L78 58 L102 44"
+        fill="none" stroke="#EDEDED" stroke-opacity="0.5" stroke-width="2.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Alternatives the model weighed but did not sample -->
+  <g stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="2" stroke-linecap="round">
+    <path d="M42 84 L56 92"/>
+    <path d="M58 70 L74 78"/>
+    <path d="M78 58 L94 66"/>
+  </g>
+  <g fill="#FFFFFF" fill-opacity="0.22">
+    <circle cx="56" cy="92" r="3"/>
+    <circle cx="74" cy="78" r="3"/>
+    <circle cx="94" cy="66" r="3"/>
+  </g>
+
+  <g fill="#EDEDED" fill-opacity="0.55">
+    <circle cx="26" cy="92" r="3.4"/>
+    <circle cx="42" cy="84" r="3.4"/>
+    <circle cx="58" cy="70" r="3.4"/>
+    <circle cx="78" cy="58" r="3.4"/>
+  </g>
+
+  <!-- Flight path vector, parked on the newest token -->
+  <circle cx="102" cy="44" r="9" fill="#0A0A0A"/>
+  <circle cx="102" cy="44" r="9" fill="none" stroke="#EDEDED" stroke-width="4"/>
+  <path d="M78 44 H93 M111 44 H122 M102 35 V23" stroke="#EDEDED" stroke-width="4" stroke-linecap="round"/>
+</svg>

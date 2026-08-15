@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Model Flight Recorder</title>
+    <meta name="description" content="Run a small language model in your own browser and read the recording: per-token timing, the probability behind every word, and the words it almost chose instead." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,350..500&display=swap" rel="stylesheet" />
+    <script>
+      /* Apply stored/system theme before first paint to avoid a darkroom flash. */
+      (function () {
+        try {
+          var stored = localStorage.getItem("mfr-theme");
+          var theme = stored === "light" || stored === "dark"
+            ? stored
+            : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!--
+      DIRECTION
+      THESIS: The scene is the application. One persistent WebGL context holds a
+        field of points — one per token in the model's vocabulary — and the app
+        flies a route through it as the model generates. Chrome floats over the
+        scene the way a map's search bar does. Numbers live one tab away.
+      SPACE: Forward distance is elapsed time, so a stall is a long dark gap you
+        fly through. Ring radius is how far behind the winner a candidate
+        finished. Halo radius is how unsure the model was. Altitude is the
+        sampled token's probability; there is no decorative spatial axis.
+      SURFACE: Vercel Geist / shadcn dark. Pure black, near-black panels,
+        white-alpha hairlines, near-white primary action, zero chroma greys.
+      TYPE: Geist Sans + Geist Mono for the instrument. Newsreader for the
+        model's own words. Tabular figures everywhere a number can change.
+      COLOR: Deep cyan is the vocabulary atmosphere. Route color runs from cool
+        cyan (confident) to signal yellow (uncertain); near-white marks selection.
+      HONEST: Only candidates WebLLM actually reported are drawn. The field is
+        the published vocab_size, and the brief says how many of them are on
+        screen. Nothing is invented to fill space, and an empty app stays empty.
+      REFUSES: decorative 3D that encodes no measurement, a scene that unmounts
+        between phases, charts stacked in front of the thing they describe.
+    -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Model Flight Recorder">
+  <title>Model Flight Recorder</title>
+  <rect width="32" height="32" rx="7" fill="#0A0A0A"/>
+  <rect x="0.6" y="0.6" width="30.8" height="30.8" rx="6.4" fill="none" stroke="#FFFFFF" stroke-opacity="0.14"/>
+
+  <!-- Horizon reference -->
+  <path d="M4.5 22.5 H27.5" stroke="#FFFFFF" stroke-opacity="0.26" stroke-width="1.3" stroke-linecap="round"/>
+
+  <!-- Flight path vector: a velocity vector to a pilot, a node with synapses to everyone else -->
+  <circle cx="16" cy="14.5" r="4" fill="none" stroke="#EDEDED" stroke-width="2.1"/>
+  <path d="M5.5 14.5 H11 M21 14.5 H26.5 M16 10.5 V6" stroke="#EDEDED" stroke-width="2.1" stroke-linecap="round"/>
+</svg>
