@@ -94,6 +94,35 @@ describe("App", () => {
     expect(screen.getByRole("tab", { name: /analytics/i }).disabled).toBe(true);
   });
 
+  it("requires a fresh download when switching to a model that is not loaded", async () => {
+    renderApp();
+
+    fireEvent.click(screen.getByRole("button", { name: /download & load/i }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^run$/i }).disabled).toBe(false);
+    });
+    expect(screen.queryByRole("button", { name: /download & load/i })).toBeNull();
+
+    fireEvent.change(screen.getByRole("combobox", { name: /subject model/i }), {
+      target: { value: "Llama-3.2-1B-Instruct-q4f16_1-MLC" },
+    });
+
+    expect(screen.getByRole("button", { name: /download & load/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^run$/i }).disabled).toBe(true);
+    expect(screen.getAllByText(/IDLE/).length).toBeGreaterThan(0);
+  });
+
+  it("shows transfer detail in the masthead while downloading", async () => {
+    renderApp();
+
+    fireEvent.click(screen.getByRole("button", { name: /download & load/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("progressbar", { name: /model download progress/i })).toBeTruthy();
+      expect(screen.getByTitle(/downloading smollm2|fetching param cache/i)).toBeTruthy();
+    });
+  });
+
   it("records a run, then offers the transcript, transport and analytics", async () => {
     renderApp();
 

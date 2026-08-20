@@ -32,7 +32,7 @@ export function FlightBrief({ model, drawnTokens, phaseName, detail }) {
           </>
         )}
       </p>
-      <p className="brief__detail">{detail}</p>
+      {detail ? <p className="brief__detail">{detail}</p> : null}
     </section>
   );
 }

@@ -183,7 +183,7 @@ export function App({ engineFactory, detectGpu } = {}) {
               model={recorder.model}
               drawnTokens={drawnTokens}
               phaseName={phaseLabel(recorder.phase.name)}
-              detail={recorder.phase.detail}
+              detail={loading ? null : recorder.phase.detail}
             />
           )}
 
@@ -208,6 +208,7 @@ export function App({ engineFactory, detectGpu } = {}) {
             loading={loading}
             phaseName={recorder.phase.name}
             loadPercent={recorder.phase.transfer?.percent ?? 0}
+            loadedModelId={recorder.loadedModelId}
           />
         </>
       ) : (

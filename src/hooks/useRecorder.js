@@ -19,8 +19,11 @@ function createRunId() {
 export function useRecorder({ engineFactory = createEngine, detectGpu = detectWebGpu } = {}) {
   const engineRef = useRef(null);
   const recordRef = useRef(null);
+  /** Model id currently resident in the engine — not the dropdown selection. */
+  const loadedModelIdRef = useRef(null);
   const [phase, setPhase] = useState(createPhaseState);
   const [model, setModel] = useState(getDefaultModel);
+  const [loadedModelId, setLoadedModelId] = useState(null);
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
   const [reply, setReply] = useState("");
   const [record, setRecord] = useState(null);
@@ -35,12 +38,34 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
     setPhase((current) => reducePhase(current, event, payload));
   }, []);
 
+  const markLoaded = useCallback((modelId) => {
+    loadedModelIdRef.current = modelId;
+    setLoadedModelId(modelId);
+  }, []);
+
+  const clearLoaded = useCallback(() => {
+    loadedModelIdRef.current = null;
+    setLoadedModelId(null);
+  }, []);
+
   const selectModel = useCallback((modelId) => {
-    setModel(getModelById(modelId));
+    const next = getModelById(modelId);
+    setModel(next);
     setReceipt(null);
     setRecord(null);
     setReply("");
-  }, []);
+
+    /* Phase was previously left at ARMED/COMPLETE after any successful load, so
+       picking a different catalog entry looked "ready" without weights for that
+       model. Only the engine-resident id is ready; everything else goes cold. */
+    if (loadedModelIdRef.current === modelId) {
+      dispatch(PHASE_EVENT.ARMED, {
+        detail: `${next.label} loaded. Weights cached in this browser.`,
+      });
+    } else {
+      dispatch(PHASE_EVENT.RESET);
+    }
+  }, [dispatch]);
 
   const arm = useCallback(async () => {
     setReceipt(null);
@@ -63,6 +88,8 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
 
       if (engineRef.current) {
         await engineRef.current.unload();
+        engineRef.current = null;
+        clearLoaded();
       }
 
       const engine = await engineFactory(wantsMock ? "mock" : "webllm");
@@ -73,16 +100,23 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
         dispatch(progress.event, { ...progress, totalMb: model.downloadMb });
       });
 
+      markLoaded(model.id);
       dispatch(PHASE_EVENT.ARMED, { detail: `${model.label} loaded. Weights cached in this browser.` });
     } catch (error) {
+      clearLoaded();
+      engineRef.current = null;
       const message = error instanceof Error ? error.message : "Failed to load model.";
       dispatch(PHASE_EVENT.FAULT, { fault: message, detail: message });
     }
-  }, [detectGpu, dispatch, engineFactory, model]);
+  }, [clearLoaded, detectGpu, dispatch, engineFactory, markLoaded, model]);
 
   const run = useCallback(async () => {
     const engine = engineRef.current;
-    if (!engine || (phase.name !== PHASE.ARMED && phase.name !== PHASE.COMPLETE)) {
+    if (
+      !engine
+      || loadedModelIdRef.current !== model.id
+      || (phase.name !== PHASE.ARMED && phase.name !== PHASE.COMPLETE)
+    ) {
       return;
     }
 
@@ -136,12 +170,15 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
     }
   }, [dispatch, gpu, model.id, phase.name, prompt]);
 
-  const canRun = (phase.name === PHASE.ARMED || phase.name === PHASE.COMPLETE) && prompt.trim().length > 0;
+  const modelReady = loadedModelId === model.id
+    && (phase.name === PHASE.ARMED || phase.name === PHASE.COMPLETE);
+  const canRun = modelReady && prompt.trim().length > 0;
   const canArm = phase.name === PHASE.COLD || phase.name === PHASE.ARMED || phase.name === PHASE.COMPLETE || phase.name === PHASE.FAULT;
 
   return {
     phase,
     model,
+    loadedModelId,
     prompt,
     setPrompt,
     reply,

@@ -409,11 +409,61 @@ a:hover {
   min-width: 0;
 }
 
+.hud__group--status {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.hud__status {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .hud__phase {
+  flex: 0 0 auto;
   color: var(--text-tertiary);
   font-family: var(--font-mono);
   font-size: var(--fs-micro);
   letter-spacing: var(--ls-micro);
+}
+
+.hud__transfer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+  max-width: min(36rem, 52vw);
+}
+
+.hud__transfer-text {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-micro);
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hud__transfer-track {
+  width: 100%;
+  height: 2px;
+  overflow: hidden;
+  background: var(--hairline);
+  border-radius: 1px;
+}
+
+.hud__transfer-fill {
+  height: 100%;
+  background: var(--tie);
+  border-radius: 1px;
+  transition: width 120ms linear;
 }
 
 .hud--inspector {
@@ -2159,6 +2209,12 @@ input[type="radio"] {
   .brand__name,
   .hud__phase {
     display: none;
+  }
+
+  /* Keep download progress visible even when the phase word is collapsed. */
+  .hud__group--status .hud__transfer {
+    display: flex;
+    max-width: min(14rem, 42vw);
   }
 
   .hud__group {

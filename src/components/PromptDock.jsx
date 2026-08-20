@@ -18,8 +18,10 @@ export function PromptDock({
   loading,
   phaseName,
   loadPercent,
+  loadedModelId = null,
 }) {
-  const cached = phaseName === PHASE.ARMED || phaseName === PHASE.COMPLETE;
+  const cached = loadedModelId === model.id
+    && (phaseName === PHASE.ARMED || phaseName === PHASE.COMPLETE);
   const downloading = phaseName === PHASE.FUELING || phaseName === PHASE.COMPILING;
 
   return (
