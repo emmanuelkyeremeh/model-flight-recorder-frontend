@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { analyzeFlight } from "../lib/analyzeFlight.js";
 import { getDefaultModel, getModelById } from "../lib/catalog.js";
 import { createEngine } from "../lib/engine/createEngine.js";
 import { appendToken, createFlightRecord, finishRecord, summarizeRecord } from "../lib/flightRecord.js";
 import { createPhaseState, PHASE, PHASE_EVENT, reducePhase } from "../lib/phases.js";
 import { buildReceipt } from "../lib/receipt.js";
-import { describeBrowser, detectWebGpu } from "../lib/webgpu.js";
+import { describeBrowser, detectDevice, detectWebGpu } from "../lib/webgpu.js";
 
 const DEFAULT_PROMPT = "Explain time-to-first-token vs inter-token latency in one short paragraph.";
 
@@ -16,7 +16,11 @@ function createRunId() {
   return `run-${Date.now()}`;
 }
 
-export function useRecorder({ engineFactory = createEngine, detectGpu = detectWebGpu } = {}) {
+export function useRecorder({
+  engineFactory = createEngine,
+  detectGpu = detectWebGpu,
+  probeDevice = detectDevice,
+} = {}) {
   const engineRef = useRef(null);
   const recordRef = useRef(null);
   /** Model id currently resident in the engine — not the dropdown selection. */
@@ -29,6 +33,7 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
   const [record, setRecord] = useState(null);
   const [receipt, setReceipt] = useState(null);
   const [gpu, setGpu] = useState(null);
+  const [device, setDevice] = useState(null);
   const [engineKind, setEngineKind] = useState("webllm");
 
   const summary = useMemo(() => (record ? summarizeRecord(record) : null), [record]);
@@ -37,6 +42,34 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
   const dispatch = useCallback((event, payload) => {
     setPhase((current) => reducePhase(current, event, payload));
   }, []);
+
+  /* Probe hardware as soon as the page opens so the dock can show GPU / RAM
+     before anyone commits to a download. */
+  useEffect(() => {
+    let cancelled = false;
+    probeDevice().then((info) => {
+      if (!cancelled) {
+        setDevice(info);
+        setGpu(info);
+      }
+    }).catch(() => {
+      if (!cancelled) {
+        setDevice({
+          available: false,
+          vendor: null,
+          architecture: null,
+          device: null,
+          description: null,
+          memoryGb: null,
+          cores: null,
+          reason: "Could not probe this device.",
+        });
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [probeDevice]);
 
   const markLoaded = useCallback((modelId) => {
     loadedModelIdRef.current = modelId;
@@ -80,6 +113,12 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
       const wantsMock = new URLSearchParams(window.location.search).get("engine") === "mock";
       const gpuInfo = await detectGpu();
       setGpu(gpuInfo);
+      setDevice((current) => ({
+        ...(current ?? {}),
+        ...gpuInfo,
+        memoryGb: current?.memoryGb ?? null,
+        cores: current?.cores ?? null,
+      }));
 
       if (!gpuInfo.available && !wantsMock) {
         dispatch(PHASE_EVENT.FAULT, { fault: gpuInfo.reason, detail: gpuInfo.reason });
@@ -187,6 +226,7 @@ export function useRecorder({ engineFactory = createEngine, detectGpu = detectWe
     summary,
     analysis,
     gpu,
+    device,
     engineKind,
     selectModel,
     arm,

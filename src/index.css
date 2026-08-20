@@ -556,22 +556,58 @@ a:hover {
 
 /* ── Prompt dock ──────────────────────────────────────── */
 
-.dock {
+.dock-stack {
   position: absolute;
   bottom: var(--s4);
   left: 50%;
   z-index: 3;
   display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  width: min(860px, calc(100vw - var(--s4) * 2));
+  transform: translateX(-50%);
+}
+
+.dock-device {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+  justify-content: center;
+  margin: 0;
+  padding: 0 var(--s2);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-micro);
+  line-height: 1.35;
+  text-shadow: var(--halo-scene);
+}
+
+.dock-device__key {
+  color: var(--text-tertiary);
+  opacity: 0.8;
+}
+
+.dock-device__value {
+  color: var(--text-secondary);
+}
+
+.dock-device__sep {
+  opacity: 0.45;
+}
+
+.dock {
+  display: flex;
   gap: var(--s2);
   align-items: center;
-  width: min(760px, calc(100vw - var(--s4) * 2));
+  width: 100%;
   padding: var(--s2);
   background: var(--glass-strong);
   border: 1px solid var(--border-strong);
   border-radius: 12px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(16px);
-  transform: translateX(-50%);
 }
 
 .dock__prompt {
@@ -599,7 +635,7 @@ a:hover {
 
 .dock__model select {
   height: 34px;
-  max-width: 190px;
+  max-width: 280px;
   padding: 0 8px;
   background: var(--bg-page);
   border: 1px solid var(--border-input);
@@ -2284,14 +2320,23 @@ input[type="radio"] {
     display: none;
   }
 
-  .dock {
+  .dock-stack {
     right: var(--s2);
     bottom: var(--s2);
     left: var(--s2);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
     width: auto;
     transform: none;
+  }
+
+  .dock-device {
+    justify-content: flex-start;
+    padding: 0 2px;
+  }
+
+  .dock {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
   }
 
   .dock__model {

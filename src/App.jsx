@@ -30,8 +30,8 @@ function revealFor(phase) {
   return 1;
 }
 
-export function App({ engineFactory, detectGpu } = {}) {
-  const recorder = useRecorder({ engineFactory, detectGpu });
+export function App({ engineFactory, detectGpu, probeDevice } = {}) {
+  const recorder = useRecorder({ engineFactory, detectGpu, probeDevice });
   const { theme, toggleTheme } = useTheme();
   const recording = isRecordingPhase(recorder.phase.name);
   const loading = isTransferPhase(recorder.phase.name);
@@ -209,6 +209,7 @@ export function App({ engineFactory, detectGpu } = {}) {
             phaseName={recorder.phase.name}
             loadPercent={recorder.phase.transfer?.percent ?? 0}
             loadedModelId={recorder.loadedModelId}
+            device={recorder.device}
           />
         </>
       ) : (

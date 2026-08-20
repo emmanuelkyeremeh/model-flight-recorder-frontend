@@ -10,8 +10,16 @@ afterEach(() => {
 const availableGpu = async () => ({
   available: true,
   vendor: "test-gpu",
+  architecture: "test-arch",
   device: "jsdom",
+  description: null,
   reason: null,
+});
+
+const probedDevice = async () => ({
+  ...(await availableGpu()),
+  memoryGb: 8,
+  cores: 8,
 });
 
 function renderApp(tokens = ["Hello", " world"]) {
@@ -19,6 +27,7 @@ function renderApp(tokens = ["Hello", " world"]) {
     <App
       engineFactory={async () => createMockEngine({ tokens })}
       detectGpu={availableGpu}
+      probeDevice={probedDevice}
     />,
   );
 }
@@ -36,10 +45,19 @@ describe("App", () => {
       return engine;
     };
 
-    render(<App engineFactory={engineFactory} detectGpu={availableGpu} />);
+    render(<App engineFactory={engineFactory} detectGpu={availableGpu} probeDevice={probedDevice} />);
     expect(screen.getByRole("button", { name: /download & load/i })).toBeTruthy();
     expect(loadCount).toBe(0);
     expect(screen.getAllByText(/IDLE/).length).toBeGreaterThan(0);
+  });
+
+  it("shows detected GPU and approximate RAM before download", async () => {
+    renderApp();
+
+    await waitFor(() => {
+      expect(screen.getByText(/test-gpu/i)).toBeTruthy();
+      expect(screen.getByText(/~8 GB RAM/i)).toBeTruthy();
+    });
   });
 
   it("opens on the vocabulary brief with no measurements invented", () => {
