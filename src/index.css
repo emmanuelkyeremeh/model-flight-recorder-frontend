@@ -2066,30 +2066,6 @@ input[type="radio"] {
   color: var(--stall);
 }
 
-/* Legacy bench bits kept for ModelPicker tests / unused screens */
-.consent,
-.composer,
-.bullets,
-.bench__link,
-.composer__field {
-  /* no-op placeholders if an unused import still mounts */
-}
-
-.composer__field {
-  display: block;
-  width: 100%;
-  padding: var(--s2);
-  background: var(--bg-well);
-  border: 1px solid var(--border-input);
-  border-radius: var(--r-control);
-  color: var(--text-primary);
-  caret-color: var(--primary);
-  font-family: var(--font-sans);
-  font-size: var(--fs-body);
-  line-height: 1.5;
-  resize: vertical;
-}
-
 /* ── Scrollbars ───────────────────────────────────────── */
 
 .stream::-webkit-scrollbar,

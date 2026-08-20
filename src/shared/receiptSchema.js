@@ -23,6 +23,9 @@ export const REQUIRED_RECEIPT_FIELDS = Object.freeze([
 const MAX_RUN_ID_LENGTH = 80;
 const MAX_MODEL_ID_LENGTH = 200;
 const MAX_RECEIPT_BYTES = 64 * 1024;
+/** UUID or run-* ids only — no path separators, spaces, or control chars. */
+const RUN_ID_PATTERN = /^[A-Za-z0-9._-]{1,80}$/;
+const MODEL_ID_PATTERN = /^[A-Za-z0-9._/+-]{1,200}$/;
 
 /**
  * @param {unknown} value
@@ -56,12 +59,24 @@ export function validateReceipt(value) {
     errors.push(`app must be ${APP_NAME}`);
   }
 
-  if (typeof receipt.run_id !== "string" || receipt.run_id.length === 0 || receipt.run_id.length > MAX_RUN_ID_LENGTH) {
-    errors.push("run_id must be a non-empty string.");
+  if (typeof receipt.run_id !== "string"
+    || receipt.run_id.length === 0
+    || receipt.run_id.length > MAX_RUN_ID_LENGTH
+    || !RUN_ID_PATTERN.test(receipt.run_id)) {
+    errors.push("run_id must be a short alphanumeric id.");
   }
 
-  if (typeof receipt.model_id !== "string" || receipt.model_id.length === 0 || receipt.model_id.length > MAX_MODEL_ID_LENGTH) {
-    errors.push("model_id must be a non-empty string.");
+  if (typeof receipt.model_id !== "string"
+    || receipt.model_id.length === 0
+    || receipt.model_id.length > MAX_MODEL_ID_LENGTH
+    || !MODEL_ID_PATTERN.test(receipt.model_id)) {
+    errors.push("model_id must be a non-empty model id.");
+  }
+
+  if (Object.prototype.hasOwnProperty.call(receipt, "__proto__")
+    || Object.prototype.hasOwnProperty.call(receipt, "constructor")
+    || Object.prototype.hasOwnProperty.call(receipt, "prototype")) {
+    errors.push("Receipt contains forbidden keys.");
   }
 
   assertFiniteNumber(errors, "model_size_mb", receipt.model_size_mb, 0);

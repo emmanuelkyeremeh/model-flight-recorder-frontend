@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "docs": "cd docs && python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt && .venv/bin/sphinx-build -b html . ../docs-html"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",

@@ -622,6 +622,9 @@ export function createFlightScene({ container, onSelect, vocabTokens, theme: ini
       if (!observer) {
         window.removeEventListener("resize", applySize);
       }
+      if (probe && window.__flightProbe) {
+        delete window.__flightProbe;
+      }
       rig.dispose();
       labels.dispose();
       field.dispose();

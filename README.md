@@ -74,6 +74,14 @@ Default model: [SmolLM2-360M-Instruct-q4f16_1-MLC](https://github.com/mlc-ai/web
 
 Weights download **only after you click Download & load**. Theme (light/dark) lives in the top bar and persists in `localStorage` as `mfr-theme`.
 
+## Security notes
+
+- Inference and prompts stay on-device. Receipts are metrics-only.
+- `index.html` ships a Content-Security-Policy and `referrer=no-referrer`.
+- Export filenames are sanitized before download.
+- `?probe=1` debug hooks are removed when the scene disposes.
+- The optional backend allowlists local Vite origins only, rejects prototype-pollution JSON keys, constrains `run_id` lookup, and sends `nosniff` / `DENY` / `no-store` headers.
+
 ## How a run moves through the code
 
 ```
@@ -289,15 +297,18 @@ The frontend is a static Vite app and works alone. If you want a local receipt a
 
 ## Docs site
 
-The Sphinx site under `docs/` walks every module in more depth than this README: how a token becomes a waypoint, how the camera damps, how the phase reducer works, what each chart draws. Build it with:
+The Sphinx site under `docs/` walks every module in more depth than this README: how a token becomes a waypoint, how the camera damps, how the phase reducer works, what each chart draws.
 
 ```bash
-cd docs
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-make html
-open _build/html/index.html
+npm run docs
+open docs-html/index.html
 ```
+
+That builds a virtualenv in `docs/.venv` and writes the site to `docs-html/`
+at the repo root. Both paths are gitignored, so the HTML is never committed.
+
+`.readthedocs.yaml` is here for the day this repo goes public. Read the Docs
+Community does not build private repositories, so read the local build instead.
 
 ## License
 
